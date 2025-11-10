@@ -1,0 +1,9 @@
+myenv/
+__pycache__/
+*.pyd
+*.dll
+*.so
+*.h5
+*.pth
+*.pkl
+*.log
