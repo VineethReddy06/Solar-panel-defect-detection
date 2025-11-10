@@ -4,6 +4,5 @@ __pycache__/
 *.dll
 *.so
 *.h5
-*.pth
 *.pkl
-*.log
+*.pth
