@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+    <style>
+        body { background: #111; color: #fff; text-align: center; font-family: Arial; }
+        img { width: 300px; margin: 20px; border-radius: 10px; }
+        .result-box { margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <h1>Prediction Result</h1>
+
+    <div class="result-box">
+        <h2>Prediction: {{ label }}</h2>
+        <h3>Confidence: {{ prob }}</h3>
+
+        <h3>Uploaded Image</h3>
+        <img src="{{ img_path }}">
+
+        <h3>Grad-CAM Heatmap</h3>
+        <img src="{{ gradcam_path }}">
+    </div>
+</body>
+</html>
