@@ -1,25 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Prediction Result</title>
-    <style>
-        body { background: #111; color: #fff; text-align: center; font-family: Arial; }
-        img { width: 300px; margin: 20px; border-radius: 10px; }
-        .result-box { margin-top: 40px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction Result</title>
+
+  <style>
+    /* BACKGROUND */
+    body {
+      margin: 0;
+      padding: 40px 0;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      background-size: 400% 400%;
+      animation: bgWave 12s ease infinite;
+      color: #fff;
+      text-align: center;
+    }
+    @keyframes bgWave {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Title */
+    h1 {
+      margin-top: 20px;
+      background: linear-gradient(90deg, #00ff9d, #00c3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2.4em;
+      animation: fadeDown 1s ease;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESULT BOX */
+    .result-box {
+      width: 420px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.25);
+      animation: fadeIn 1.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Confidence meter */
+    .confidence {
+      margin-top: 10px;
+      width: 80%;
+      height: 12px;
+      margin-left: auto;
+      margin-right: auto;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff9d, #00c3ff);
+      width: 0%;
+      animation: fillBar 1.4s forwards ease-in-out;
+    }
+
+    @keyframes fillBar {
+      from { width: 0%; }
+      to { width: {{ prob * 100 }}%; }
+    }
+
+    /* Image cards */
+    .content {
+      display: flex;
+      justify-content: center;
+      gap: 35px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .card {
+      width: 320px;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 25px rgba(0, 255, 180, 0.15);
+      text-align: center;
+      animation: slideUp 1.2s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 255, 220, 0.3);
+      transition: 0.3s;
+    }
+    img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+    }
+
+    /* Back button */
+    .back-btn {
+      display: inline-block;
+      margin-top: 35px;
+      padding: 12px 32px;
+      background: linear-gradient(90deg, #00ff9d, #00c3ff);
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #000;
+      font-size: 16px;
+      box-shadow: 0 0 18px rgba(0, 255, 240, 0.5);
+      transition: 0.3s;
+    }
+    .back-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+    }
+
+    footer {
+      margin-top: 40px;
+      opacity: 0.6;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Prediction Result</h1>
 
-    <div class="result-box">
-        <h2>Prediction: {{ label }}</h2>
-        <h3>Confidence: {{ prob }}</h3>
+  <h1>Prediction Result</h1>
 
-        <h3>Uploaded Image</h3>
-        <img src="{{ img_path }}">
+  <!-- RESULT SUMMARY -->
+  <div class="result-box">
+    <h2>{{ label }}</h2>
+    <h3>Confidence: {{ (prob * 100) | round(2) }}%</h3>
 
-        <h3>Grad-CAM Heatmap</h3>
-        <img src="{{ gradcam_path }}">
+    <div class="confidence">
+      <div class="confidence-fill"></div>
     </div>
+  </div>
+
+  <!-- IMAGE CARDS -->
+  <div class="content">
+    <div class="card">
+      <h3>Uploaded Image</h3>
+      <img src="{{ img_path }}" alt="Uploaded Image">
+    </div>
+
+    <div class="card">
+      <h3>Grad-CAM Visualization</h3>
+      <img src="{{ gradcam_path }}" alt="Gradcam Output">
+    </div>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <a class="back-btn" href="/">← Upload Another Image</a>
+
+  <footer>
+    Solar Panel Defect Detection • AI-Powered Analysis
+  </footer>
+
 </body>
 </html>

@@ -1,22 +1,188 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Solar Panel Defect Detection</title>
-    <style>
-        body { background: #111; color: #fff; text-align: center; font-family: Arial; }
-        .box { margin-top: 150px; }
-        input[type="file"] { padding: 10px; }
-        button { padding: 10px 20px; background: #28a745; color: white; border: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar Panel Defect Detection</title>
+
+  <style>
+    /* BACKGROUND */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      background-size: 400% 400%;
+      animation: bgWave 12s ease infinite;
+      color: #fff;
+    }
+    @keyframes bgWave {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* NAVBAR */
+    .navbar {
+      width: 100%;
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 15px rgba(0, 255, 220, 0.15);
+      z-index: 99;
+    }
+    .navbar h2 {
+      background: linear-gradient(90deg, #00ff9d, #00c3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      font-size: 22px;
+    }
+
+    /* MAIN CARD */
+    .container {
+      width: 420px;
+      margin: 140px auto 50px auto;
+      padding: 40px;
+      border-radius: 18px;
+      backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 30px rgba(0, 255, 220, 0.18);
+      text-align: center;
+      animation: fadeIn 1.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.10);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      margin-bottom: 25px;
+    }
+
+    #preview {
+      width: 100%;
+      border-radius: 14px;
+      display: none;
+      box-shadow: 0 0 18px rgba(0, 255, 220, 0.35);
+      margin-bottom: 20px;
+    }
+
+    /* BUTTON */
+    button {
+      padding: 12px 32px;
+      border-radius: 10px;
+      font-size: 17px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, #00ff9d, #00c3ff);
+      color: #000;
+      font-weight: bold;
+      transition: 0.3s;
+      box-shadow: 0 0 14px rgba(0, 255, 220, 0.45);
+    }
+    button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+    }
+
+    /* LOADING OVERLAY */
+    #loadingOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      color: #00ffc8;
+      font-size: 24px;
+    }
+
+    .loader {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid #00ffc6;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 18px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.8em;
+      opacity: 0.7;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="box">
-        <h1>Solar Panel Defect Detection</h1>
-        <form action="/predict" method="POST" enctype="multipart/form-data">
-            <input type="file" name="image" required>
-            <br><br>
-            <button type="submit">Predict</button>
-        </form>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <h2>Solar Panel Defect Detector</h2>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay">
+    <div>
+      <div class="loader"></div>
+      Processing Image...
     </div>
+  </div>
+
+  <form class="container" action="/predict" method="POST" enctype="multipart/form-data" onsubmit="startLoading()">
+
+    <h1 style="font-size: 26px; margin-bottom: 25px;">Upload Image</h1>
+
+    <input type="file" id="imageUpload" name="image" accept="image/*" required onchange="previewImage(event)">
+    <img id="preview" />
+
+    <button type="submit">🔍 Analyze</button>
+
+    <footer>Powered by DenseNet121 + Grad-CAM</footer>
+  </form>
+
+
+  <script>
+    function previewImage(event) {
+      const file = event.target.files[0];
+      const preview = document.getElementById("preview");
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function startLoading() {
+      document.getElementById("loadingOverlay").style.display = "flex";
+    }
+  </script>
+
 </body>
 </html>
